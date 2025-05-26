@@ -1,0 +1,6 @@
+INCLUDE=1
+COUT=2
+IDENTIFIER=3
+WS=4
+'#include'=1
+'cout'=2

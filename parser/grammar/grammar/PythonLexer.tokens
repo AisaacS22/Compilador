@@ -1,0 +1,7 @@
+PRINT=1
+DEF=2
+IDENTIFIER=3
+NEWLINE=4
+WS=5
+'print'=1
+'def'=2

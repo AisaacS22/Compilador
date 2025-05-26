@@ -1,0 +1,10 @@
+PROGRAM=1
+BEGIN=2
+END=3
+WRITELN=4
+IDENTIFIER=5
+WS=6
+'program'=1
+'begin'=2
+'end'=3
+'writeln'=4

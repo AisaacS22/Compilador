@@ -1,0 +1,30 @@
+digraph {
+	node [color="#2d3436" fillcolor="#636e72" fontcolor=white fontname=Consolas shape=box style=filled]
+	"Raíz" [label=Programa]
+	nodo_1 [label="Línea 1"]
+	"Raíz" -> nodo_1
+	nodo_1_0 [label=<html>]
+	nodo_1 -> nodo_1_0
+	nodo_2 [label="Línea 2"]
+	"Raíz" -> nodo_2
+	nodo_2_0 [label=<head></head>]
+	nodo_2 -> nodo_2_0
+	nodo_3 [label="Línea 3"]
+	"Raíz" -> nodo_3
+	nodo_3_0 [label=<body>]
+	nodo_3 -> nodo_3_0
+	nodo_4 [label="Línea 4"]
+	"Raíz" -> nodo_4
+	nodo_4_0 [label="<p>Hola"]
+	nodo_4 -> nodo_4_0
+	nodo_4_1 [label="mundo</p>"]
+	nodo_4 -> nodo_4_1
+	nodo_5 [label="Línea 5"]
+	"Raíz" -> nodo_5
+	nodo_5_0 [label=</body>]
+	nodo_5 -> nodo_5_0
+	nodo_6 [label="Línea 6"]
+	"Raíz" -> nodo_6
+	nodo_6_0 [label=</html>]
+	nodo_6 -> nodo_6_0
+}
