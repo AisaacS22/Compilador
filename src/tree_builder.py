@@ -1,46 +1,67 @@
 # src/tree_builder.py
 
+import os
+import time
+import re
+import html
 from graphviz import Digraph
-import re, os, time
 
-def _sanitize_label(texto):
-    # Elimina corchetes, comillas y todo lo que Graphviz no tolere en IDs
-    return re.sub(r'[^0-9A-Za-z_]', '_', texto)
-
-def generar_arbol(codigo):
+def _sanitize_id(nombre: str) -> str:
     """
-    Intenta generar el árbol. Si falla, lanza una excepción controlada
-    con el mensaje de Graphviz.
+    Devuelve un nombre válido para node IDs en Graphviz:
+    sólo letras, números y guiones bajos.
+    """
+    return re.sub(r'[^0-9A-Za-z_]', '_', nombre)
+
+def generar_arbol(codigo: str) -> str:
+    """
+    Genera un árbol sintáctico de las líneas y tokens de 'codigo'.
+    - Cada línea es un subnodo de 'Programa'.
+    - Cada token es un subnodo de su línea.
+    Devuelve la ruta al PNG generado.
+    Si Graphviz falla, lanza SyntaxError con el mensaje.
     """
     try:
-        arbol = Digraph(format='png')
-        arbol.attr('node', shape='box', style='filled',
-                   color='#2d3436', fontname='Consolas',
-                   fontcolor='white', fillcolor='#636e72')
+        dot = Digraph(format='png')
+        dot.attr(
+            'node',
+            shape='box',
+            style='filled',
+            color='#2d3436',
+            fontname='Consolas',
+            fontcolor='white',
+            fillcolor='#636e72'
+        )
 
-        root_id = "Nodo_Raiz"
-        arbol.node(root_id, "Programa")
+        # Nodo raíz
+        root_id = _sanitize_id("Nodo_Raiz")
+        dot.node(root_id, "Programa")
 
+        # Procesar cada línea
         for i, linea in enumerate(codigo.strip().splitlines(), start=1):
-            nid = f"linea_{i}"
-            arbol.node(nid, f"Línea {i}")
-            arbol.edge(root_id, nid)
+            line_id = _sanitize_id(f"linea_{i}")
+            dot.node(line_id, f"Línea {i}")
+            dot.edge(root_id, line_id)
 
-            for j, token in enumerate(linea.strip().split(), start=1):
-                label = _sanitize_label(token)
-                tid   = f"{nid}_{j}"
-                arbol.node(tid, token)  # mantiene label original
-                arbol.edge(nid, tid)
+            # Tokenizar: palabras (\w+) o cualquier carácter no espacio/no palabra
+            tokens = re.findall(r'\w+|[^\s\w]', linea)
+            for j, tok in enumerate(tokens, start=1):
+                tid = _sanitize_id(f"{line_id}_{j}")
+                label = html.escape(tok)  # escapa <, >, &, etc.
+                dot.node(tid, label)
+                dot.edge(line_id, tid)
 
-        # Carpeta de salida
-        if not os.path.exists("trees"):
-            os.makedirs("trees")
+        # Crear carpeta si no existe
+        folder = "trees"
+        os.makedirs(folder, exist_ok=True)
+
+        # Guardar con timestamp único
         timestamp = int(time.time())
-        salida = f"trees/arbol_{timestamp}"
-        # Si falla aquí, capturamos abajo
-        arbol.render(salida, cleanup=True)
-        return salida + ".png"
+        path_no_ext = os.path.join(folder, f"arbol_{timestamp}")
+        dot.render(path_no_ext, cleanup=True)
+
+        return path_no_ext + ".png"
 
     except Exception as e:
-        # Propaga como SyntaxError para que main.py lo recoja
+        # Convierte cualquier error de Graphviz en SyntaxError
         raise SyntaxError(f"Graphviz error: {e}")
